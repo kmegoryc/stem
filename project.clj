@@ -1,10 +1,11 @@
 (defproject stem "0.1.0-SNAPSHOT"
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
+  :description "Live feedback system"
+  :url "https://github.com/kmegoryc/stem"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
   :dependencies [[org.clojure/clojure "1.8.0"]
+                 [garden "1.3.2"]
                  [ring-server "0.4.0"]
                  [reagent "0.7.0"]
                  [reagent-utils "0.2.1"]
@@ -12,6 +13,8 @@
                  [ring/ring-defaults "0.3.1"]
                  [compojure "1.6.0"]
                  [hiccup "1.0.5"]
+                 [thinktopic/think.semantic-ui "0.1.71.0-0"]
+                 [thinktopic/greenhouse "0.1.1"]
                  [yogthos/config "0.9"]
                  [org.clojure/clojurescript "1.9.908"
                   :scope "provided"]
@@ -65,19 +68,20 @@
               :source-map true
               :optimizations :none
               :pretty-print  true}}
-
-
-
             }
    }
 
+  :garden
+  {:builds [{:source-paths ["src/clj"]
+             :stylesheet stem.styles.core/styles
+             :compiler {:output-to "resources/public/css/site.css"
+                        :pretty-print? true}}]}
 
   :figwheel
   {:http-server-root "public"
    :server-port 3449
    :nrepl-port 7002
-   :nrepl-middleware ["cemerick.piggieback/wrap-cljs-repl"
-                      ]
+   :nrepl-middleware ["cemerick.piggieback/wrap-cljs-repl"]
    :css-dirs ["resources/public/css"]
    :ring-handler stem.handler/app}
 
@@ -93,12 +97,11 @@
                                   [figwheel-sidecar "0.5.13"]
                                   [org.clojure/tools.nrepl "0.2.13"]
                                   [com.cemerick/piggieback "0.2.2"]
-                                  [pjstadig/humane-test-output "0.8.2"]
-                                  ]
+                                  [pjstadig/humane-test-output "0.8.2"]]
 
                    :source-paths ["env/dev/clj"]
                    :plugins [[lein-figwheel "0.5.13"]
-                             ]
+                             [lein-garden "0.3.0"]]
 
                    :injections [(require 'pjstadig.humane-test-output)
                                 (pjstadig.humane-test-output/activate!)]
@@ -107,7 +110,7 @@
 
              :uberjar {:hooks [minify-assets.plugin/hooks]
                        :source-paths ["env/prod/clj"]
-                       :prep-tasks ["compile" ["cljsbuild" "once" "min"]]
+                       :prep-tasks ["compile" ["garden" "once"] ["cljsbuild" "once" "min"] "minify-assets"]
                        :env {:production true}
                        :aot :all
                        :omit-source true}})

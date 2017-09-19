@@ -17,7 +17,8 @@
    [:meta {:charset "utf-8"}]
    [:meta {:name "viewport"
            :content "width=device-width, initial-scale=1"}]
-   (include-css (if (env :dev) "/css/site.css" "/css/site.min.css"))])
+   (include-css  "//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.css"
+                 (if (env :dev) "/css/site.css" "/css/site.min.css"))])
 
 (defn loading-page []
   (html5
@@ -30,7 +31,7 @@
 (defroutes routes
   (GET "/" [] (loading-page))
   (GET "/about" [] (loading-page))
-  
+
   (resources "/")
   (not-found "Not Found"))
 
