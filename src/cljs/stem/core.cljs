@@ -3,28 +3,22 @@
             [reagent.session :as session]
             [secretary.core :as secretary :include-macros true]
             [accountant.core :as accountant]
+            [stem.pages.home :as home]
+            [stem.pages.audience :as audience]
+            [stem.pages.speaker :as speaker]
             [think.semantic-ui :as ui]))
 
 ;; -------------------------
 ;; Views
 
 (def nav
-  [ui/menu {:color :blue :inverted true :pointing true :borderless true}
+  [ui/menu {:inverted true :pointing true :borderless true}
+   [ui/menu-item
+    [ui/image {:src "http://www.guruadvisor.net/images/numero11/cloud.png" :height 32}]]
    [ui/menu-menu {:position :right}
     [ui/menu-item {:position :right} [:a {:href "/"} "Home"]]
     [ui/menu-item {:position :right} [:a {:href "/speaker"} "Speaker"]]
     [ui/menu-item {:position :right} [:a {:href "/audience"} "Audience"]]]])
-
-(defn home-page []
-  [:div [ui/header {:as "h3"} "Welcome"]])
-
-(defn speaker-page []
-  [:div [:h2 "About stem"]
-   [:div [:a {:href "/"} "go to the home page"]]])
-
-(defn audience-page []
-  [:div [:h2 "About stem"]
-   [:div [:a {:href "/"} "go to the home page"]]])
 
 (defn current-page []
   [:div.page
@@ -36,13 +30,13 @@
 ;; Routes
 
 (secretary/defroute "/" []
-  (session/put! :current-page #'home-page))
+  (session/put! :current-page #'home/home-page))
 
 (secretary/defroute "/speaker" []
-  (session/put! :current-page #'speaker-page))
+  (session/put! :current-page #'speaker/speaker-page))
 
 (secretary/defroute "/audience" []
-  (session/put! :current-page #'audience-page))
+  (session/put! :current-page #'audience/audience-page))
 
 ;; -------------------------
 ;; Initialize app

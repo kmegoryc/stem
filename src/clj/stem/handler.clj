@@ -18,6 +18,7 @@
    [:meta {:name "viewport"
            :content "width=device-width, initial-scale=1"}]
    (include-css  "//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.css"
+                 "https://code.getmdl.io/1.3.0/material.indigo-pink.min.css"
                  (if (env :dev) "/css/site.css" "/css/site.min.css"))])
 
 (defn loading-page []
@@ -25,12 +26,14 @@
     (head)
     [:body {:class "body-container"}
      mount-target
-     (include-js "/js/app.js")]))
+     (include-js "/js/app.js"
+                 "https://code.getmdl.io/1.3.0/material.min.js")]))
 
 
 (defroutes routes
   (GET "/" [] (loading-page))
-  (GET "/about" [] (loading-page))
+  (GET "/speaker" [] (loading-page))
+  (GET "/audience" [] (loading-page))
 
   (resources "/")
   (not-found "Not Found"))
