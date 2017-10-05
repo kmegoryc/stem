@@ -36,3 +36,14 @@ div.page div.content-section {
   }
 
 }
+
+div.page div.content-section div.module {
+  padding: 40px;
+  border-radius: 5px;
+  border: 1px solid lightgrey;
+  margin: 20px 0;
+}
+
+div.page div.content-section div.module div.teacher-header {
+  margin-top: 10px;
+}

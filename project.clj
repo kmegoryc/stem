@@ -10,9 +10,12 @@
                  [reagent "0.7.0"]
                  [reagent-utils "0.2.1"]
                  [ring "1.6.2"]
+                 [ring-middleware-format "0.7.2"]
                  [ring/ring-defaults "0.3.1"]
                  [compojure "1.6.0"]
+                 [cljs-ajax "0.6.0"]
                  [hiccup "1.0.5"]
+                 [http-kit "2.2.0"]
                  [thinktopic/think.semantic-ui "0.1.71.0-0"]
                  [thinktopic/greenhouse "0.1.1"]
                  [yogthos/config "0.9"]
@@ -24,8 +27,14 @@
 
   :plugins [[lein-environ "1.0.2"]
             [lein-cljsbuild "1.1.5"]
+            [lein-heroku "0.5.3"]
             [lein-asset-minifier "0.2.7"
              :exclusions [org.clojure/clojure]]]
+
+  :heroku {:app-name "stem-feedback"
+           :jdk-version "1.8"
+           :include-files ["target/stem.jar"]
+           :process-types { "web" "java -jar target/stem.jar"}}
 
   :ring {:handler stem.handler/app
          :uberwar-name "stem.war"}
