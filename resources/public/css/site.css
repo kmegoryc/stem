@@ -1,15 +1,15 @@
-div.page .menu {
+div.wrapper .menu {
   border-radius: 0;
 }
 
-div.page div.content-section {
+div.wrapper div.page-content {
   width: 100%;
   padding: 30px;
 }
 
 @media screen and (min-width: 768px) {
 
-  div.page div.content-section {
+  div.wrapper div.page-content {
     width: auto;
     max-width: 950px;
     float: none;
@@ -24,7 +24,7 @@ div.page div.content-section {
 
 @media screen and (min-width: 1224px) {
 
-  div.page div.content-section {
+  div.wrapper div.page-content {
     width: auto;
     max-width: 1200px;
     float: none;
@@ -37,13 +37,19 @@ div.page div.content-section {
 
 }
 
-div.page div.content-section div.module {
+div.wrapper div.page-content div.results-module {
+  position: relative;
   padding: 40px;
   border-radius: 5px;
   border: 1px solid lightgrey;
   margin: 20px 0;
 }
 
-div.page div.content-section div.module div.teacher-header {
+div.wrapper div.page-content div.results-module div.teacher-header {
   margin-top: 10px;
+}
+
+div.wrapper div.page-content div.response-module {
+  position: relative;
+  padding: 40px 0;
 }

@@ -29,9 +29,9 @@
 
 
 (defn current-page []
-  [:div.page
+  [:div.wrapper
    nav
-   [:div.content-section
+   [:div.page-content
     [(session/get :current-page)]]])
 
 ;; -------------------------

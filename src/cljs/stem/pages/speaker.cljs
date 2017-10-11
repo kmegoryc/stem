@@ -82,13 +82,13 @@
           [ui/feed-summary (str id " posted a comment.")]
           [ui/feed-extra {:text true} choice]]]) votes)]])
 
-(defn module
+(defn results-module
   [i {:keys [datatype name option1 option2 avg votes]}]
   (let [datatypes {:feedback "Open Feedback"
                    :slider "Slider"
                    :toggle "Toggle"}]
     ^{:key i}
-    [:div.module {:style {:position :relative}}
+    [:div.results-module
      [ui/header {:size "medium"} option1]
      [ui/button {:primary true :icon true :circular true :style {:position :absolute :top 0 :right 0 :margin "10px"}}
       [ui/icon {:name "remove"}]]
@@ -99,9 +99,9 @@
 (defn speaker-page []
   [:div.speaker-page
    [ui/header {:size "large"} "Speaker"]
-   [:div.results
+   [:div.content-section
     [create-module]
     (map-indexed
       (fn [i element]
-        (module i element))
+        (results-module i element))
       @all-data*)]])

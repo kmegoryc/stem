@@ -3,12 +3,17 @@
             [garden.units :refer [px em percent]]
             [greenhouse.grid :refer [column span clearfix center stack align on cycle-props]]))
 
-(def module
-  [:div.module {:padding (px 40)
-                :border-radius (px 5)
-                :border "1px solid lightgrey"
-                :margin [[(px 20) 0]]}
+(def results-module
+  [:div.results-module {:position :relative
+                        :padding (px 40)
+                        :border-radius (px 5)
+                        :border "1px solid lightgrey"
+                        :margin [[(px 20) 0]]}
    [:div.teacher-header {:margin-top (px 10)}]])
+
+(def response-module
+  [:div.response-module {:position :relative
+                         :padding [[(px 40) 0]]}])
 
 (def variables
   {:max-width (px 1200)
@@ -25,8 +30,9 @@
                              :pad 30)])))
 
 (defstyles styles
-  [:div.page
+  [:div.wrapper
    [:.menu {:border-radius 0}]
-   [:div.content-section
+   [:div.page-content
     content-section
-    module]])
+    results-module
+    response-module]])
