@@ -14,7 +14,6 @@
                  [ring/ring-defaults "0.3.1"]
                  [compojure "1.6.0"]
                  [cljs-ajax "0.6.0"]
-                 [cljs-http "0.1.42"]
                  [hiccup "1.0.5"]
                  [http-kit "2.2.0"]
                  [thinktopic/think.semantic-ui "0.1.71.0-0"]

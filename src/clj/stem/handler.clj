@@ -40,6 +40,7 @@
   (let [request-fp (assoc (:params request) :votes [])
         conj-result (conj (edn/read-string (slurp "modules.edn")) request-fp)]
     (spit "modules.edn" conj-result))
+  (println "got to add module")
   {:status 200
    :body "add successful"})
 
