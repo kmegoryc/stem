@@ -7,7 +7,19 @@
   (atom nil))
 
 (def all-data*
-  (atom [{:datatype "Open Feedback", :name "Feedback", :option1 "Should we work outside?", :option2 "", :avg "50", :votes [{:name "Feedback", :id "keren", :choice "Yes!"}]} {:datatype "Toggle", :name "Content", :option1 "Too Little", :option2 "Too Much", :avg "50", :votes []} {:datatype "Slider", :name "Pace", :option1 "Too Slow", :option2 "Too Fast", :avg "50", :votes [{:name "Pace", :id "keren", :choice "29"} {:name "Pace", :id "Keren", :choice "64"}]}]))
+  (atom nil))
+
+(defn handler [response]
+  (do
+    (reset! all-data* response)
+    (.log js/console (str "all data received"))))
+
+(defn error-handler [{:keys [status status-text]}]
+  (.log js/console (str "something bad happened: " status " " status-text)))
+
+(defn read-data []
+  (GET "/read-data" {:handler handler
+                     :error-handler error-handler}))
 
 (defn user-info []
   [:div.user-info
@@ -66,6 +78,8 @@
            (feedback name option1 option2)
            :else
            [:div.error "Error rendering components."])]))
+
+(read-data)
 
 (defn audience-page []
   [:div.audience-page

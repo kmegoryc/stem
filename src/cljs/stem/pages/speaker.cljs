@@ -1,11 +1,23 @@
 (ns stem.pages.speaker
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [reagent.core :as reagent :refer [atom]]
-            [ajax.core :refer [GET POST]]
+            [ajax.core :refer [GET POST PUT]]
             [think.semantic-ui :as ui]))
 
 (def all-data*
-  (atom [{:datatype "Open Feedback", :name "Feedback", :option1 "Should we work outside?", :option2 "", :avg "50", :votes [{:name "Feedback", :id "keren", :choice "Yes!"}]} {:datatype "Toggle", :name "Content", :option1 "Too Little", :option2 "Too Much", :avg "50", :votes []} {:datatype "Slider", :name "Pace", :option1 "Too Slow", :option2 "Too Fast", :avg "50", :votes [{:name "Pace", :id "keren", :choice "29"} {:name "Pace", :id "Keren", :choice "64"}]}]))
+  (atom nil))
+
+(defn handler [response]
+  (do
+    (reset! all-data* response)
+    (.log js/console (str response))))
+
+(defn error-handler [{:keys [status status-text]}]
+  (.log js/console (str "something bad happened: " status " " status-text)))
+
+(defn read-data []
+  (GET "/read-data" {:handler handler
+                     :error-handler error-handler}))
 
 (defn create-module []
   (let [create* (atom {:datatype "Choose a Module"
@@ -48,7 +60,11 @@
               [ui/form-input {:label "Option 2" :placeholder "Ex: Too Fast"
                               :on-change (fn [ev data]
                                            (swap! create* assoc :option2 (:value (js->clj data :keywordize-keys true))))}]]
-             [ui/button {:primary true} "Submit"]])]]]])))
+             [ui/button {:primary true
+                         :on-click (fn [ev]
+                                     (POST "/add-module"
+                                           {:params @create*
+                                            :error-handler error-handler}))} "Submit"]])]]]])))
 
 (defn progress
   [avg votes option1 option2]
@@ -95,6 +111,8 @@
      (if (= datatype (datatypes :feedback))
        (feed votes)
        (progress avg votes option1 option2))]))
+
+(read-data)
 
 (defn speaker-page []
   [:div.speaker-page
