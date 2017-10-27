@@ -1,25 +1,11 @@
 (ns stem.pages.audience
   (:require [reagent.core :as reagent :refer [atom]]
             [ajax.core :refer [GET POST]]
+            [stem.data :refer [all-data* read-data post-data-handler error-handler]]
             [think.semantic-ui :as ui]))
 
 (def username*
   (atom nil))
-
-(def all-data*
-  (atom nil))
-
-(defn handler [response]
-  (do
-    (reset! all-data* response)
-    (.log js/console (str "all data received"))))
-
-(defn error-handler [{:keys [status status-text]}]
-  (.log js/console (str "something bad happened: " status " " status-text)))
-
-(defn read-data []
-  (GET "/read-data" {:handler handler
-                     :error-handler error-handler}))
 
 (defn user-info []
   [:div.user-info
@@ -36,32 +22,63 @@
   [:div.toggle
    [ui/header {:size "medium"} name]
    [ui/button-group
-    [ui/button {:disabled (empty? @username*)} option1]
+    [ui/button {:disabled (empty? @username*)
+                :on-click (fn [ev]
+                            (POST "/update-module"
+                                  {:params {:id @username* :name name :choice 0}
+                                   :handler post-data-handler
+                                   :error-handler error-handler})
+                            (read-data))} option1]
     [ui/button-or]
-    [ui/button {:disabled (nil? @username*)} option2]]])
+    [ui/button {:disabled (nil? @username*)
+                :on-click (fn [ev]
+                            (POST "/update-module"
+                                  {:params {:id @username* :name name :choice 100}
+                                   :handler post-data-handler
+                                   :error-handler error-handler})
+                            (read-data))} option2]]])
 
 (defn slider
   [name option1 option2]
   [:div.slider
    [ui/header {:size "medium"} name]
-   [:input {:disabled (empty? @username*)
+   [:input {:class "mdl-slider mdl-js-slider"
+            :disabled (empty? @username*)
             :type "range"
             :min 0
             :max 100
-            :style {:width "95%"} :class "mdl-slider mdl-js-slider"}]
+            :style {:width "95%"}
+            :on-change (fn [ev data]
+                         (let [value (.-target.value ev)]
+                           (POST "/update-module"
+                                 {:params {:id @username* :name name :choice value}
+                                  :handler post-data-handler
+                                  :error-handler error-handler})
+                           (read-data)))}]
    [:div.labels {:style {:height "20px" :position :relative}}]
    [:div {:style {:float "left" :color "grey"}} option1]
    [:div {:style {:float "right" :color "grey"}} option2]])
 
 (defn feedback
   [name option1 option2]
-  [:div.feedback
-   [ui/header {:size "medium"} name]
-   [ui/form
-    [ui/text-area {:disabled (empty? @username*)
-                   :placeholder option1
-                   :autoHeight true}]
-    [ui/button {:primary true :style {:margin "10px 0"} :href "#"} "Submit Feedback"]]])
+  (let [feedback* (atom nil)]
+    [:div.feedback
+     [ui/header {:size "medium"} name]
+     [ui/form
+      [ui/text-area {:disabled (empty? @username*)
+                     :placeholder option1
+                     :autoHeight true
+                     :on-change (fn [ev data]
+                                  (reset! feedback* (:value (js->clj data :keywordize-keys true))))}]
+      [ui/button {:primary true
+                  :style {:margin "10px 0"}
+                  :href "#"
+                  :on-click (fn [ev]
+                              (POST "/update-module"
+                                    {:params {:id @username* :name name :choice @feedback*}
+                                     :handler post-data-handler
+                                     :error-handler error-handler})
+                              (read-data))} "Submit Feedback"]]]))
 
 (defn response-module
   [i {:keys [datatype name option1 option2 avg votes]}]
@@ -82,12 +99,13 @@
 (read-data)
 
 (defn audience-page []
-  [:div.audience-page
-   [ui/header {:size "large"} "Audience"]
-   [:div.content-section
-    [user-info]
-    (doall
-      (map-indexed
-        (fn [i element]
-          (response-module i element))
-        @all-data*))]])
+  (fn []
+    [:div.audience-page
+     [ui/header {:size "large"} "Audience"]
+     [:div.content-section
+      [user-info]
+      (doall
+        (map-indexed
+          (fn [i element]
+            (response-module i element))
+          @all-data*))]]))

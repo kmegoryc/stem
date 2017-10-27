@@ -1,23 +1,8 @@
 (ns stem.pages.speaker
-  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [reagent.core :as reagent :refer [atom]]
             [ajax.core :refer [GET POST PUT]]
-            [think.semantic-ui :as ui]))
-
-(def all-data*
-  (atom nil))
-
-(defn handler [response]
-  (do
-    (reset! all-data* response)
-    (.log js/console (str response))))
-
-(defn error-handler [{:keys [status status-text]}]
-  (.log js/console (str "something bad happened: " status " " status-text)))
-
-(defn read-data []
-  (GET "/read-data" {:handler handler
-                     :error-handler error-handler}))
+            [think.semantic-ui :as ui]
+            [stem.data :refer [all-data* read-data post-data-handler error-handler]]))
 
 (defn create-module []
   (let [create* (atom {:datatype "Choose a Module"
@@ -64,7 +49,9 @@
                          :on-click (fn [ev]
                                      (POST "/add-module"
                                            {:params @create*
-                                            :error-handler error-handler}))} "Submit"]])]]]])))
+                                            :handler post-data-handler
+                                            :error-handler error-handler})
+                                     (read-data))} "Submit"]])]]]])))
 
 (defn progress
   [avg votes option1 option2]
@@ -106,7 +93,16 @@
     ^{:key i}
     [:div.results-module
      [ui/header {:size "medium"} option1]
-     [ui/button {:primary true :icon true :circular true :style {:position :absolute :top 0 :right 0 :margin "10px"}}
+     [ui/button {:primary true
+                 :icon true
+                 :circular true
+                 :style {:position :absolute :top 0 :right 0 :margin "10px"}
+                 :on-click (fn [ev]
+                             (POST "/remove-module"
+                                   {:params {:name name}
+                                    :handler post-data-handler
+                                    :error-handler error-handler})
+                             (read-data))}
       [ui/icon {:name "remove"}]]
      (if (= datatype (datatypes :feedback))
        (feed votes)
@@ -115,11 +111,12 @@
 (read-data)
 
 (defn speaker-page []
-  [:div.speaker-page
-   [ui/header {:size "large"} "Speaker"]
-   [:div.content-section
-    [create-module]
-    (map-indexed
-      (fn [i element]
-        (results-module i element))
-      @all-data*)]])
+  (fn []
+    [:div.speaker-page
+     [ui/header {:size "large"} "Speaker"]
+     [:div.content-section
+      [create-module]
+      (map-indexed
+        (fn [i element]
+          (results-module i element))
+        @all-data*)]]))
