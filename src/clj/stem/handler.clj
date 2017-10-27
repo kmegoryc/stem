@@ -51,9 +51,6 @@
         new-file (remove (fn [module]
                            (= name-to-remove (:name module))) file)]
     (spit "modules.edn" (pr-str new-file))
-    (prn (str "remove request: " request-fp))
-    (println "file: " file)
-    (spit "modules.edn" (pr-str new-file))
     {:status 200
      :body "remove successful"}))
 
