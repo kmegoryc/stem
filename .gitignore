@@ -5,7 +5,6 @@
 /resources/public/css/site.css
 /resources/public/css/site.min.css
 profiles.clj
-modules.edn
 pom.xml
 pom.xml.asc
 *.jar
