@@ -82,7 +82,7 @@
 
 (defn response-module
   [i {:keys [datatype name option1 option2 avg votes]}]
-  (let [datatypes {:feedback "Open Feedback"
+  (let [datatypes {:feedback "Question"
                    :slider "Slider"
                    :toggle "Toggle"}]
     ^{:key i}

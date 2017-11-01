@@ -10,7 +10,7 @@
                        :option1 nil
                        :option2 nil
                        :avg 50})
-        module-options ["Slider" "Toggle" "Open Feedback"]]
+        module-options ["Slider" "Toggle" "Question"]]
     (fn []
       [:div.create-module
        [ui/modal {:trigger (reagent/as-element [ui/button {:primary true} "Create New Module"])}
@@ -33,18 +33,24 @@
                            :on-change (fn [ev data]
                                         (swap! create* assoc :datatype (:value (js->clj data :keywordize-keys true))))
                            :text (@create* :datatype)}]]
-            [ui/form-input {:placeholder "Name (Ex: Pace)"
+            [ui/form-input {:placeholder (cond
+                                           (= (@create* :datatype) "Question")
+                                           "Ex: Do you have any questions about that concept?"
+                                           :else
+                                           "Ex: How's my pace?")
                             :on-change (fn [ev data]
                                          (swap! create* assoc :name (:value (js->clj data :keywordize-keys true))))}]]]
           (when (contains? (into #{} module-options) (@create* :datatype))
-            [:div.module-options
-             [ui/form-group
-              [ui/form-input {:label "Option 1" :placeholder "Ex: Too Slow"
-                              :on-change (fn [ev data]
-                                           (swap! create* assoc :option1 (:value (js->clj data :keywordize-keys true))))}]
-              [ui/form-input {:label "Option 2" :placeholder "Ex: Too Fast"
-                              :on-change (fn [ev data]
-                                           (swap! create* assoc :option2 (:value (js->clj data :keywordize-keys true))))}]]
+            [:div.module-options-and-submit
+             (when-not (= (@create* :datatype) "Question")
+               [:div.module-options
+                [ui/form-group
+                 [ui/form-input {:label "Option 1" :placeholder "Ex: Too Slow"
+                                 :on-change (fn [ev data]
+                                              (swap! create* assoc :option1 (:value (js->clj data :keywordize-keys true))))}]
+                 [ui/form-input {:label "Option 2" :placeholder "Ex: Too Fast"
+                                 :on-change (fn [ev data]
+                                              (swap! create* assoc :option2 (:value (js->clj data :keywordize-keys true))))}]]])
              [ui/button {:primary true
                          :on-click (fn [ev]
                                      (POST "/add-module"
@@ -87,12 +93,12 @@
 
 (defn results-module
   [i {:keys [datatype name option1 option2 avg votes]}]
-  (let [datatypes {:feedback "Open Feedback"
+  (let [datatypes {:feedback "Question"
                    :slider "Slider"
                    :toggle "Toggle"}]
     ^{:key i}
     [:div.results-module
-     [ui/header {:size "medium"} option1]
+     [ui/header {:size "medium"} name]
      [ui/button {:primary true
                  :icon true
                  :circular true
