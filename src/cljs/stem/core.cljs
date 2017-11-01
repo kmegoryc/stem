@@ -21,11 +21,7 @@
    [ui/menu-menu {:position :right}
     [ui/menu-item {:position :right} [:a {:href "/"} "Home"]]
     [ui/menu-item {:position :right} [:a {:href "/speaker"} "Speaker"]]
-    [ui/menu-item {:position :right} [:a {:href "/audience"} "Audience"]]
-    [ui/menu-item {:position :right}
-     [ui/input {:focus true :inverted true :placeholder "Username" :style {:margin-right "10px"}
-                :on-change (fn [ev data]
-                             (reset! username* (:value (js->clj data :keywordize-keys true))))}]]]])
+    [ui/menu-item {:position :right} [:a {:href "/audience"} "Audience"]]]])
 
 
 (defn current-page []
