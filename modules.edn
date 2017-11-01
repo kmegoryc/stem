@@ -1,1 +1,0 @@
-[{:datatype "Question", :name "Questio?", :option1 nil, :option2 nil, :avg 50, :votes [{:id "keren", :name "Questio?", :choice "Yes"}]} {:datatype "Slider", :name "Pace", :option1 "Too Slow", :option2 "Too Fast", :avg 50, :votes [{:id "Keren", :name "Pace", :choice "85"} {:id "Sarah", :name "Pace", :choice "6"} {:id "keren", :name "Pace", :choice "54"}]}]
