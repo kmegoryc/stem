@@ -43,6 +43,7 @@ div.wrapper div.page-content div.results-module {
   border-radius: 5px;
   border: 1px solid lightgrey;
   margin: 20px 0;
+  box-shadow: 0 0 15px hsla(0, 0%, 0%, 0.2);
 }
 
 div.wrapper div.page-content div.results-module div.teacher-header {
@@ -51,5 +52,9 @@ div.wrapper div.page-content div.results-module div.teacher-header {
 
 div.wrapper div.page-content div.response-module {
   position: relative;
-  padding: 40px 0;
+  padding: 40px;
+  border-radius: 5px;
+  border: 1px solid lightgrey;
+  margin: 20px 0;
+  box-shadow: 0 0 15px hsla(0, 0%, 0%, 0.2);
 }

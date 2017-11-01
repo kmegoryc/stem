@@ -4,11 +4,14 @@
 /resources/public/js
 /resources/public/css/site.css
 /resources/public/css/site.min.css
+modules.edn
 profiles.clj
 pom.xml
 pom.xml.asc
 *.jar
 *.class
+*.min.css
+*.css
 /.lein-*
 /.nrepl-port
 /out
