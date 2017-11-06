@@ -83,12 +83,12 @@
   [:div.feed
    [ui/feed {:style {:margin "20px 0"}}
     (map-indexed
-      (fn [j {:keys [id name choice]}]
+      (fn [j {:keys [id name choice anonymous]}]
         ^{:key (random-uuid)}
         [ui/feed-event
          [ui/feed-label {:image "http://www.infragistics.com/media/8948/anonymous_200.gif"}]
          [ui/feed-content
-          [ui/feed-summary (str id " posted a comment.")]
+          [ui/feed-summary (if anonymous "Anonymous posted a comment." (str id " posted a comment."))]
           [ui/feed-extra {:text true} choice]]]) votes)]])
 
 (defn results-module

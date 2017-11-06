@@ -7,6 +7,9 @@
 (def username*
   (atom nil))
 
+(def anonymous-toggle*
+  (atom true))
+
 (defn user-info []
   [:div.user-info
    [ui/input {:focus true
@@ -14,8 +17,7 @@
               :on-change (fn [ev data]
                            (reset! username* (:value (js->clj data :keywordize-keys true))))}]
    (if-not (empty? @username*)
-     [ui/header {:color "teal" :size "medium"} (str "Welcome, " @username* "!")]
-     [ui/header {:color "teal" :size "medium"} (str "Please enter your username above to enable feedback submissions.")])])
+     [ui/header {:color "teal" :size "medium"} (str "Welcome, " @username* "!")])])
 
 (defn toggle
   [name option1 option2]
@@ -55,13 +57,14 @@
                                   :handler post-data-handler
                                   :error-handler error-handler})
                            (read-data)))}]
-   [:div.labels {:style {:height "20px" :position :relative}}]
-   [:div {:style {:float "left" :color "grey"}} option1]
-   [:div {:style {:float "right" :color "grey"}} option2]])
+   [:div.labels {:style {:height "20px" :position :relative}}
+    [:div {:style {:float "left" :color "grey"}} option1]
+    [:div {:style {:float "right" :color "grey"}} option2]]])
 
 (defn feedback
   [name option1 option2]
-  (let [feedback* (atom nil)]
+  (let [feedback* (atom nil)
+        toggle @anonymous-toggle*]
     [:div.feedback
      [ui/header {:size "medium"} name]
      [ui/form
@@ -75,17 +78,17 @@
                   :href "#"
                   :on-click (fn [ev]
                               (POST "/update-module"
-                                    {:params {:id @username* :name name :choice @feedback*}
+                                    {:params {:id @username* :name name :choice @feedback* :anonymous toggle}
                                      :handler post-data-handler
                                      :error-handler error-handler})
                               (read-data))} "Submit Feedback"]]]))
 
 (defn response-module
-  [i {:keys [datatype name option1 option2 avg votes]}]
+  [{:keys [datatype name option1 option2 avg votes]}]
   (let [datatypes {:feedback "Question"
                    :slider "Slider"
                    :toggle "Toggle"}]
-    ^{:key i}
+    ^{:key (random-uuid)}
     [:div.response-module
      (cond (= datatype (datatypes :toggle))
            (toggle name option1 option2)
@@ -98,14 +101,25 @@
 
 (read-data)
 
+(defn anonymous-mode []
+  (fn []
+    [:div.anonymous-label {:style {:float "right"}}
+     [ui/label {:color :teal
+                :style {:cursor :pointer}
+                :on-click (fn [ev data]
+                            (reset! anonymous-toggle* (not @anonymous-toggle*))
+                            (println @anonymous-toggle*))}
+      [ui/icon {:name (if @anonymous-toggle* "toggle on" "toggle off")}]
+      (str "Anonymous Mode " (if @anonymous-toggle* "ON" "OFF"))]]))
+
 (defn audience-page []
   (fn []
     [:div.audience-page
-     [ui/header {:size "large"} "Audience"]
+     [anonymous-mode]
      [:div.content-section
       [user-info]
       (doall
-        (map-indexed
-          (fn [i element]
-            (response-module i element))
+        (map
+          (fn [element]
+            (response-module element))
           @all-data*))]]))
