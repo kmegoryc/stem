@@ -1,11 +1,14 @@
 (ns stem.handler
   (:require [clojure.edn :as edn]
+            [clojure.java.io :as io]
             [config.core :refer [env]]
             [compojure.core :refer [GET POST PUT defroutes]]
             [compojure.route :refer [not-found resources]]
             [hiccup.page :refer [include-js include-css html5]]
             [stem.middleware :refer [wrap-middleware]]
-            [ring.util.response :refer [redirect content-type resource-response response status]]))
+            [ring.util.response :refer [redirect content-type resource-response response status]]
+            [resource-seq.core :refer [resource-seq]]
+            [clojure.java.io :as io]))
 
 (def mount-target
   [:div#app
@@ -31,33 +34,40 @@
      (include-js "/js/app.js"
                  "https://code.getmdl.io/1.3.0/material.min.js")]))
 
+(defn read-edn []
+  (->> (resource-seq)
+    (filter #(and (.contains (first %) "public/data") (.contains (first %) ".edn")))
+    (map (fn [[path reader-fn]]
+           (with-open [r (reader-fn)] (edn/read-string (slurp r)))))
+    (first)))
+
+(defn write-edn [edn-updated]
+  (spit "resources/public/data/modules.edn" edn-updated))
+
 (defn read-data []
-  {:status 200
-   :body (edn/read-string (slurp "modules.edn"))})
+  (response (read-edn)))
 
 (defn add-module
   [request]
   (let [request-fp (assoc (:params request) :votes [])
-        conj-result (conj (edn/read-string (slurp "modules.edn")) request-fp)]
-    (spit "modules.edn" conj-result))
-  {:status 200
-   :body "add module successful"})
+        conj-result (conj (read-edn) request-fp)]
+    (write-edn conj-result))
+  (response "add module successful"))
 
 (defn remove-module
   [request]
   (let [request-fp (:params request)
         name-to-remove (:name request-fp)
-        file (edn/read-string (slurp "modules.edn"))
+        file (read-edn)
         new-file (remove (fn [module]
                            (= name-to-remove (:name module))) file)]
-    (spit "modules.edn" (pr-str new-file))
-    {:status 200
-     :body "remove successful"}))
+    (write-edn (pr-str new-file))
+    (response "remove successful")))
 
 (defn update-module
   [request]
   (let [request-fp (:params request)
-        file-data (vec (edn/read-string (slurp "modules.edn")))
+        file-data (vec (read-edn))
         module-index (first (remove nil? (map-indexed (fn [i {:keys [name]}]
                                                         (if (= (:name request-fp) name)
                                                           i)) file-data)))
@@ -69,9 +79,8 @@
                    ;;if vote index is not nil, then update-in conj :votes with new request
                    (assoc-in file-data [module-index :votes vote-index] request-fp)
                    (update-in file-data [module-index :votes] conj request-fp))]
-    (spit "modules.edn" (pr-str new-data)))
-  {:status 200
-   :body "update successful"})
+    (write-edn (pr-str new-data)))
+  (response "update successful"))
 
 (defroutes routes
   (GET "/" [] (loading-page))

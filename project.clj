@@ -12,6 +12,7 @@
                  [ring "1.6.2"]
                  [ring-middleware-format "0.7.2"]
                  [ring/ring-defaults "0.3.1"]
+                 [resource-seq "0.2.0"]
                  [compojure "1.6.0"]
                  [cljs-ajax "0.6.0"]
                  [org.clojure/core.async "0.3.443"]
