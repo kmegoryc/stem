@@ -23,7 +23,7 @@
    [:meta {:name "viewport"
            :content "width=device-width, initial-scale=1"}]
    (include-css  "//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.css"
-                 "https://code.getmdl.io/1.3.0/material.indigo-pink.min.css"
+                 "/css/slider.css"
                  (if (env :dev) "/css/site.css" "/css/site.min.css"))])
 
 (defn loading-page []

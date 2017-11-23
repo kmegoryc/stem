@@ -42,21 +42,19 @@
 
 (defn slider
   [name option1 option2]
-  [:div.slider
+  [:div.slide
    [ui/header {:size "medium"} name]
-   [:input {:class "mdl-slider mdl-js-slider"
-            :disabled (empty? @username*)
-            :type "range"
-            :min 0
-            :max 100
-            :style {:width "95%"}
-            :on-change (fn [ev data]
-                         (let [value (.-target.value ev)]
-                           (POST "/update-module"
-                                 {:params {:id @username* :name name :choice value}
-                                  :handler post-data-handler
-                                  :error-handler error-handler})
-                           (read-data)))}]
+   [:div {:id "slidecontainer"}
+    [:input {:class "slider" :id "myRange"
+             :disabled (empty? @username*)
+             :type "range"
+             :min 0 :max 100
+             :on-change (fn [ev data]
+                          (let [value (.-target.value ev)]
+                            (POST "/update-module"
+                                  {:params {:id @username* :name name :choice value}
+                                   :handler update-module-handler
+                                   :error-handler error-handler})))}]]
    [:div.labels {:style {:height "20px" :position :relative}}
     [:div {:style {:float "left" :color "grey"}} option1]
     [:div {:style {:float "right" :color "grey"}} option2]]])
