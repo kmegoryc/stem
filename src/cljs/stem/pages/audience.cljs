@@ -1,7 +1,7 @@
 (ns stem.pages.audience
   (:require [reagent.core :as reagent :refer [atom]]
             [ajax.core :refer [GET POST]]
-            [stem.data :refer [all-data* read-data post-data-handler error-handler]]
+            [stem.data :refer [all-data* read-data update-module-handler error-handler]]
             [think.semantic-ui :as ui]))
 
 (def username*
@@ -28,17 +28,15 @@
                 :on-click (fn [ev]
                             (POST "/update-module"
                                   {:params {:id @username* :name name :choice 0}
-                                   :handler post-data-handler
-                                   :error-handler error-handler})
-                            (read-data))} option1]
+                                   :handler update-module-handler
+                                   :error-handler error-handler}))} option1]
     [ui/button-or]
     [ui/button {:disabled (nil? @username*)
                 :on-click (fn [ev]
                             (POST "/update-module"
                                   {:params {:id @username* :name name :choice 100}
-                                   :handler post-data-handler
-                                   :error-handler error-handler})
-                            (read-data))} option2]]])
+                                   :handler update-module-handler
+                                   :error-handler error-handler}))} option2]]])
 
 (defn slider
   [name option1 option2]
@@ -77,9 +75,8 @@
                   :on-click (fn [ev]
                               (POST "/update-module"
                                     {:params {:id @username* :name name :choice @feedback* :anonymous toggle}
-                                     :handler post-data-handler
-                                     :error-handler error-handler})
-                              (read-data))} "Submit Feedback"]]]))
+                                     :handler update-module-handler
+                                     :error-handler error-handler}))} "Submit Feedback"]]]))
 
 (defn response-module
   [{:keys [datatype name option1 option2 avg votes]}]
@@ -97,8 +94,6 @@
            :else
            [:div.error "Error rendering components."])]))
 
-(read-data)
-
 (defn anonymous-mode []
   (fn []
     [:div.anonymous-label {:style {:float "right"}}
@@ -111,13 +106,18 @@
       (str "Anonymous Mode " (if @anonymous-toggle* "ON" "OFF"))]]))
 
 (defn audience-page []
-  (fn []
-    [:div.audience-page
-     [anonymous-mode]
-     [:div.content-section
-      [user-info]
-      (doall
-        (map
-          (fn [element]
-            (response-module element))
-          @all-data*))]]))
+  (reagent/create-class
+    {:component-did-mount
+     (fn []
+       (read-data))
+     :reagent-render
+     (fn []
+       [:div.audience-page
+        [anonymous-mode]
+        [:div.content-section
+         [user-info]
+         (doall
+           (map
+             (fn [element]
+               (response-module element))
+             @all-data*))]])}))

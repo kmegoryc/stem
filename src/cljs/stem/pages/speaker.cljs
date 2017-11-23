@@ -2,7 +2,7 @@
   (:require [reagent.core :as reagent :refer [atom]]
             [ajax.core :refer [GET POST PUT]]
             [think.semantic-ui :as ui]
-            [stem.data :refer [all-data* read-data post-data-handler error-handler]]))
+            [stem.data :refer [all-data* read-data add-module-handler remove-module-handler error-handler]]))
 
 (defn create-module []
   (let [create* (atom {:datatype "Choose a Module"
@@ -55,9 +55,8 @@
                          :on-click (fn [ev]
                                      (POST "/add-module"
                                            {:params @create*
-                                            :handler post-data-handler
-                                            :error-handler error-handler})
-                                     (read-data))} "Submit"]])]]]])))
+                                            :handler add-module-handler
+                                            :error-handler error-handler}))} "Submit"]])]]]])))
 
 (defn progress
   [avg votes option1 option2]
@@ -106,23 +105,24 @@
                  :on-click (fn [ev]
                              (POST "/remove-module"
                                    {:params {:name name}
-                                    :handler post-data-handler
-                                    :error-handler error-handler})
-                             (read-data))}
+                                    :handler remove-module-handler
+                                    :error-handler error-handler}))}
       [ui/icon {:name "remove"}]]
      (if (= datatype (datatypes :feedback))
        (feed votes)
        (progress avg votes option1 option2))]))
 
-(read-data)
-
 (defn speaker-page []
-  (fn []
-    [:div.speaker-page
-     [ui/header {:size "large"} "Speaker"]
-     [:div.content-section
-      [create-module]
-      (map-indexed
-        (fn [i element]
-          (results-module i element))
-        @all-data*)]]))
+  (reagent/create-class
+    {:component-did-mount
+     (fn []
+       (read-data))
+     :reagent-render
+     (fn []
+       [:div.speaker-page
+        [:div.content-section
+         [create-module]
+         (map-indexed
+           (fn [i element]
+             (results-module i element))
+           @all-data*)]])}))
