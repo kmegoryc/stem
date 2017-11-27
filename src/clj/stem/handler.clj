@@ -8,7 +8,11 @@
             [stem.middleware :refer [wrap-middleware]]
             [ring.util.response :refer [redirect content-type resource-response response status]]
             [resource-seq.core :refer [resource-seq]]
-            [clojure.java.io :as io]))
+            [clojure.java.io :as io]
+            [monger.core :as mongo]
+            [monger.collection :as coll])
+  (:import org.bson.types.ObjectId))
+
 
 (def mount-target
   [:div#app
