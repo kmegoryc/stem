@@ -14,8 +14,7 @@
 
 (def results-module
   [:div.results-module
-   module-styles
-   [:div.teacher-header {:margin-top (px 10)}]])
+   module-styles])
 
 (def response-module
   [:div.response-module
@@ -25,7 +24,7 @@
   {:max-width (px 1200)
    :max-width-tablet (px 950)})
 
-(def content-section
+(def section
   (list {:width (percent 100)
          :padding (px 30)}
         (on :tablet [:&
@@ -37,8 +36,9 @@
 
 (defstyles styles
   [:div.wrapper
-   [:.menu {:border-radius 0}]
+   [:.segment {:border-radius 0}]
    [:div.page-content
-    content-section
-    results-module
-    response-module]])
+    section
+    [:div.content-section
+     results-module
+     response-module]]])

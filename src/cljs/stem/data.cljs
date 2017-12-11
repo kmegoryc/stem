@@ -2,34 +2,34 @@
   (:require [reagent.core :as reagent :refer [atom]]
             [ajax.core :refer [GET POST PUT]]))
 
-(def all-data*
+(def all-surveys*
   (atom nil))
 
-(defn read-data-handler [response]
+(defn read-surveys-handler [response]
   (do
-    (reset! all-data* response)
-    (.log js/console (str "all data: " response))))
+    (reset! all-surveys* response)
+    (.log js/console (str "all surveys: " response))))
 
 (defn error-handler [{:keys [status status-text]}]
   (.log js/console (str "something bad happened: " status " " status-text)))
 
-(defn read-data []
-  (GET "/read-data" {:handler read-data-handler
-                     :error-handler error-handler}))
+(defn read-surveys []
+  (GET "/read-surveys" {:handler read-surveys-handler
+                        :error-handler error-handler}))
 
-(defn update-module-handler []
+(defn update-survey-handler []
   (do
-    (read-data)
+    (read-surveys)
     (.log js/console (str "update successful"))))
 
-(defn add-module-handler []
+(defn add-survey-handler []
   (do
-    (read-data)
+    (read-surveys)
     (.log js/console (str "add successful"))))
 
-(defn remove-module-handler []
+(defn remove-survey-handler []
   (do
-    (read-data)
+    (read-surveys)
     (.log js/console (str "remove successful"))))
 
 #_(add-watch all-data* :watcher

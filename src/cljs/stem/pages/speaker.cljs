@@ -2,7 +2,7 @@
   (:require [reagent.core :as reagent :refer [atom]]
             [ajax.core :refer [GET POST PUT]]
             [think.semantic-ui :as ui]
-            [stem.data :refer [all-data* read-data add-module-handler remove-module-handler error-handler]]))
+            [stem.data :refer [all-surveys* read-surveys add-survey-handler remove-survey-handler error-handler]]))
 
 (defn create-module []
   (let [create* (atom {:datatype "Choose a Module"
@@ -13,8 +13,12 @@
         module-options ["Slider" "Toggle" "Question"]]
     (fn []
       [:div.create-module
-       [ui/modal {:trigger (reagent/as-element [ui/button {:primary true} "Create New Module"])}
-        [ui/modal-header "Create a New Module"]
+       [ui/modal {:trigger (reagent/as-element
+                             [ui/button {:primary true
+                                         :icon "plus"
+                                         :labelPosition :left
+                                         :content "New Survey"}])}
+        [ui/modal-header "Create a New Survey"]
         [ui/modal-content
          [ui/form
           [:div.module-type
@@ -53,9 +57,9 @@
                                               (swap! create* assoc :option2 (:value (js->clj data :keywordize-keys true))))}]]])
              [ui/button {:primary true
                          :on-click (fn [ev]
-                                     (POST "/add-module"
+                                     (POST "/add-survey"
                                            {:params @create*
-                                            :handler add-module-handler
+                                            :handler add-survey-handler
                                             :error-handler error-handler}))} "Submit"]])]]]])))
 
 (defn progress
@@ -103,26 +107,23 @@
                  :circular true
                  :style {:position :absolute :top 0 :right 0 :margin "10px"}
                  :on-click (fn [ev]
-                             (POST "/remove-module"
+                             (POST "/remove-survey"
                                    {:params {:name name}
-                                    :handler remove-module-handler
+                                    :handler remove-survey-handler
                                     :error-handler error-handler}))}
       [ui/icon {:name "remove"}]]
      (if (= datatype (datatypes :feedback))
        (feed votes)
        (progress avg votes option1 option2))]))
 
+(read-surveys)
+
 (defn speaker-page []
-  (reagent/create-class
-    {:component-did-mount
-     (fn []
-       (read-data))
-     :reagent-render
-     (fn []
-       [:div.speaker-page
-        [:div.content-section
-         [create-module]
-         (map-indexed
-           (fn [i element]
-             (results-module i element))
-           @all-data*)]])}))
+  (fn []
+    [:div.speaker-page
+     [:div.content-section
+      [create-module]
+      (map-indexed
+        (fn [i element]
+          (results-module i element))
+        @all-surveys*)]]))

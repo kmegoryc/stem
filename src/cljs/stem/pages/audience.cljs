@@ -1,7 +1,7 @@
 (ns stem.pages.audience
   (:require [reagent.core :as reagent :refer [atom]]
             [ajax.core :refer [GET POST]]
-            [stem.data :refer [all-data* read-data update-module-handler error-handler]]
+            [stem.data :refer [all-surveys* read-surveys update-survey-handler error-handler]]
             [think.semantic-ui :as ui]))
 
 (def username*
@@ -26,16 +26,16 @@
    [ui/button-group
     [ui/button {:disabled (empty? @username*)
                 :on-click (fn [ev]
-                            (POST "/update-module"
+                            (POST "/update-survey"
                                   {:params {:id @username* :name name :choice 0}
-                                   :handler update-module-handler
+                                   :handler update-survey-handler
                                    :error-handler error-handler}))} option1]
     [ui/button-or]
     [ui/button {:disabled (nil? @username*)
                 :on-click (fn [ev]
-                            (POST "/update-module"
+                            (POST "/update-survey"
                                   {:params {:id @username* :name name :choice 100}
-                                   :handler update-module-handler
+                                   :handler update-survey-handler
                                    :error-handler error-handler}))} option2]]])
 
 (defn slider
@@ -49,9 +49,9 @@
              :min 0 :max 100
              :on-change (fn [ev data]
                           (let [value (.-target.value ev)]
-                            (POST "/update-module"
+                            (POST "/update-survey"
                                   {:params {:id @username* :name name :choice value}
-                                   :handler update-module-handler
+                                   :handler update-survey-handler
                                    :error-handler error-handler})))}]]
    [:div.labels {:style {:height "20px" :position :relative}}
     [:div {:style {:float "left" :color "grey"}} option1]
@@ -59,8 +59,7 @@
 
 (defn feedback
   [name option1 option2]
-  (let [feedback* (atom nil)
-        toggle @anonymous-toggle*]
+  (let [feedback* (atom nil)]
     [:div.feedback
      [ui/header {:size "medium"} name]
      [ui/form
@@ -73,9 +72,9 @@
                   :style {:margin "10px 0"}
                   :href "#"
                   :on-click (fn [ev]
-                              (POST "/update-module"
+                              (POST "/update-survey"
                                     {:params {:id @username* :name name :choice @feedback* :anonymous toggle}
-                                     :handler update-module-handler
+                                     :handler update-survey-handler
                                      :error-handler error-handler}))} "Submit Feedback"]]]))
 
 (defn response-module
@@ -105,19 +104,16 @@
       [ui/icon {:name (if @anonymous-toggle* "toggle on" "toggle off")}]
       (str "Anonymous Mode " (if @anonymous-toggle* "ON" "OFF"))]]))
 
+(read-surveys)
+
 (defn audience-page []
-  (reagent/create-class
-    {:component-did-mount
-     (fn []
-       (read-data))
-     :reagent-render
-     (fn []
-       [:div.audience-page
-        [anonymous-mode]
-        [:div.content-section
-         [user-info]
-         (doall
-           (map
-             (fn [element]
-               (response-module element))
-             @all-data*))]])}))
+  (fn []
+    [:div.audience-page
+     [anonymous-mode]
+     [:div.content-section
+      [user-info]
+      (doall
+        (map
+          (fn [element]
+            (response-module element))
+          @all-surveys*))]]))

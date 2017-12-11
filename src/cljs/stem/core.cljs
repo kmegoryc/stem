@@ -14,19 +14,25 @@
 (def username*
   (atom nil))
 
-(def nav
-  [ui/menu {:inverted true :pointing true :borderless true}
-   [ui/menu-item
-    [ui/image {:src "http://www.guruadvisor.net/images/numero11/cloud.png" :height 32}]]
-   [ui/menu-menu {:position :right}
-    [ui/menu-item {:position :right} [:a {:href "/"} "Home"]]
-    [ui/menu-item {:position :right} [:a {:href "/speaker"} "Speaker"]]
-    [ui/menu-item {:position :right} [:a {:href "/audience"} "Audience"]]]])
+(defn nav []
+  [ui/segment {:inverted true
+               :style {:padding "10px 5px"}}
+   [ui/menu {:inverted true :secondary true}
+    [ui/menu-item {:style {:padding "0 0 0 20px"}}
+     [ui/image {:size "mini"
+                :src "/images/logo_white.png"}]]
+    [ui/menu-menu {:position :right}
+     [ui/menu-item {:position :right}
+      [:a {:href "/"} "Home"]]
+     [ui/menu-item {:position :right}
+      [:a {:href "/speaker"} "Speaker"]]
+     [ui/menu-item {:position :right}
+      [:a {:href "/audience"} "Audience"]]]]])
 
 
 (defn current-page []
   [:div.wrapper
-   nav
+   [nav]
    [:div.page-content
     [(session/get :current-page)]]])
 

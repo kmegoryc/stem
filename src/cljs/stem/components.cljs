@@ -1,5 +1,6 @@
 (ns stem.components
-  (:require [think.semantic-ui :as ui]))
+  (:require [reagent.core :as reagent :refer [atom]]
+            [think.semantic-ui :as ui]))
 
 (defn button
   [name option1 option2]
