@@ -5,7 +5,6 @@
             [compojure.route :refer [not-found resources]]
             [hiccup.page :refer [include-js include-css html5]]
             [stem.middleware :refer [wrap-middleware]]
-            [stem.styles.global.typography :as typography]
             [ring.util.response :refer [redirect content-type resource-response response status]]
             [stem.model :refer [create-survey remove-survey update-survey read-surveys]]))
 
@@ -20,8 +19,11 @@
 (defn head []
   [:head
    [:meta {:charset "utf-8"}]
-   [:meta {:name "viewport"
-           :content "width=device-width, initial-scale=1"}]
+   [:meta {:name "google-signin-client_id"
+           :content "430298023856-oqov216tqs012mqlfurvqkup9eai9k7h.apps.googleusercontent.com"}]
+   [:script {:src "https://apis.google.com/js/platform.js"
+             :async true
+             :defer true}]
    (include-css  "//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.css"
                  "/css/slider.css"
                  "https://fonts.googleapis.com/css?family=Roboto"

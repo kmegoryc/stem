@@ -1,7 +1,7 @@
 (ns stem.styles.core
   (:require [garden.def :refer [defstyles]]
             [garden.color :as color :refer [hsl rgb rgba]]
-            [garden.units :refer [px em percent]]
+            [garden.units :refer [px em percent vh]]
             [greenhouse.grid :refer [column span clearfix center stack align on cycle-props]]))
 
 (def module-styles
@@ -34,10 +34,21 @@
                      (center :max-width (:max-width variables)
                              :pad 30)])))
 
+(def clear
+  [:.-clear
+   [:&:after
+    {:content "' '"
+     :display :table
+     :clear :both}]])
+
 (defstyles styles
   [:div.wrapper
-   [:.segment {:border-radius 0}]
+   clear
+   [:.segment {:border-radius 0
+               :margin 0}]
    [:div.page-content
-    section
+    [:.menu {:border-radius 0
+             :height (vh 100)}]
     [:div.content-section
+     section
      response-module]]])

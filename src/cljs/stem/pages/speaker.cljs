@@ -119,6 +119,16 @@
         component (if (= datatype (datatypes :feedback))
                     (if-not (= (count votes) 0) (feed votes) [:i "Waiting for responses..."])
                     (progress avg votes option1 option2))
+        remove-button [ui/button {:basic true
+                                  :primary true
+                                  :icon true
+                                  :circular true
+                                  :on-click (fn [ev]
+                                              (POST "/remove-survey"
+                                                    {:params {:name name}
+                                                     :handler remove-survey-handler
+                                                     :error-handler error-handler}))}
+                       [ui/icon {:name "remove"}]]
         component-modal [ui/modal {:trigger (reagent/as-element
                                               [ui/icon {:name "external"
                                                         :style {:cursor :pointer}
@@ -133,21 +143,12 @@
     ^{:key i}
     [ui/table-row
      [ui/table-cell {:textAlign :center}
-      [ui/button {:basic true
-                  :primary true
-                  :icon true
-                  :circular true
-                  :on-click (fn [ev]
-                              (POST "/remove-survey"
-                                    {:params {:name name}
-                                     :handler remove-survey-handler
-                                     :error-handler error-handler}))}
-       [ui/icon {:name "remove"}]]]
+      remove-button]
      [ui/table-cell
       [ui/item-header name]]
      [ui/table-cell {:width :six}
       component]
-     [ui/table-cell {:verticalAlign :center}
+     [ui/table-cell
       component-modal]
      [ui/table-cell {:style {:color :grey
                              :font-size "13px"}}
@@ -156,6 +157,12 @@
       [ui/rating {:maxRating 5
                   :disabled true
                   :rating importance}]]]))
+
+(defn class-menu []
+  [ui/menu {:inverted true :vertical true}
+   [ui/menu-item {:active true}
+    [ui/label {:color :teal} "1"]
+    "Class 1"]])
 
 (read-surveys)
 
@@ -192,11 +199,15 @@
                               (if (= @organize-by* "timestamp") :timestamp :importance)
                               @all-surveys*)))]]
         [:div.speaker-page
-         [:div.content-section
-          [create-module]
-          [ui/table {:size "large"
-                     :basic true
-                     :attached :top
-                     :style {:border-radius "0px"}}
-           table-header
-           table-body]]]))))
+         [ui/grid
+          [ui/grid-column {:width 3}
+           [class-menu]]
+          [ui/grid-column {:width 13}
+           [:div.content-section
+            [create-module]
+            [ui/table {:size "large"
+                       :basic true
+                       :attached :top
+                       :style {:border-radius "0px"}}
+             table-header
+             table-body]]]]]))))
