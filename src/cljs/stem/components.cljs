@@ -2,30 +2,17 @@
   (:require [reagent.core :as reagent :refer [atom]]
             [think.semantic-ui :as ui]))
 
-(defn button
-  [name option1 option2]
-  [:div
-   [ui/header {:size "medium"} name]
-   [ui/button-group
-    [ui/button option1]
-    [ui/button-or]
-    [ui/button option2]]])
-
-(defn slider
-  [name option1 option2]
-  [:div
-   [ui/header {:size "medium"} name]
-   [:input {:min 0
-            :max 20
-            :type "range"
-            :defaultValue 10}]])
-
-(defn poll
-  [name option1 option2]
-  [:div
-   [ui/header {:size "medium"} name]])
-
-(defn open-feedback
-  [name option1]
-  [:div
-   [ui/header {:size "medium"} name]])
+(defn nav [access]
+  [ui/segment {:inverted true
+               :style {:padding "10px 5px"
+                       :background "#1c4869"
+                       :letter-spacing "1.5px"}}
+   [ui/menu {:inverted true :secondary true}
+    [ui/menu-item {:style {:padding "0 0 0 20px"}}
+     [ui/image {:size "mini"
+                :src "/images/logo_white.png"}]]
+    [ui/menu-menu {:position :right}
+     [ui/menu-item {:position :right}
+      [:a {:href "/speaker"} access]]
+     [ui/menu-item {:position :right}
+      [:a {:href "/"} "SETTINGS"]]]]])

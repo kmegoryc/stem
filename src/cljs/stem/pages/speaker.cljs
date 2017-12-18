@@ -4,6 +4,7 @@
             [think.semantic-ui :as ui]
             [cljs-time.core :as t]
             [cljs-time.local :as l]
+            [stem.components :refer [nav]]
             [cljs-time.format :as f :refer [formatters formatter]]
             [stem.data :refer [all-surveys* read-surveys add-survey-handler remove-survey-handler error-handler]]))
 
@@ -162,7 +163,7 @@
   [ui/menu {:inverted true :vertical true}
    [ui/menu-item {:active true}
     [ui/label {:color :teal} "1"]
-    "Class 1"]])
+    "Capstone 2"]])
 
 (read-surveys)
 
@@ -198,16 +199,19 @@
                             (sort-by
                               (if (= @organize-by* "timestamp") :timestamp :importance)
                               @all-surveys*)))]]
-        [:div.speaker-page
-         [ui/grid
-          [ui/grid-column {:width 3}
-           [class-menu]]
-          [ui/grid-column {:width 13}
-           [:div.content-section
-            [create-module]
-            [ui/table {:size "large"
-                       :basic true
-                       :attached :top
-                       :style {:border-radius "0px"}}
-             table-header
-             table-body]]]]]))))
+        [:div
+         [nav "TEACHER"]
+         [:div.page-content
+          [:div.speaker-page
+           [ui/grid
+            [ui/grid-column {:width 3}
+             [class-menu]]
+            [ui/grid-column {:width 13}
+             [:div.content-section
+              [create-module]
+              [ui/table {:size "large"
+                         :basic true
+                         :attached :top
+                         :style {:border-radius "0px"}}
+               table-header
+               table-body]]]]]]]))))

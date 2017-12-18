@@ -11,32 +11,9 @@
 ;; -------------------------
 ;; Views
 
-(def username*
-  (atom nil))
-
-(defn nav []
-  [ui/segment {:inverted true
-               :style {:padding "10px 5px"
-                       :background "#1c4869"
-                       :letter-spacing "1.5px"}}
-   [ui/menu {:inverted true :secondary true}
-    [ui/menu-item {:style {:padding "0 0 0 20px"}}
-     [ui/image {:size "mini"
-                :src "/images/logo_white.png"}]]
-    [ui/menu-menu {:position :right}
-     [ui/menu-item {:position :right}
-      [:a {:href "/"} "HOME"]]
-     [ui/menu-item {:position :right}
-      [:a {:href "/speaker"} "SPEAKER"]]
-     [ui/menu-item {:position :right}
-      [:a {:href "/audience"} "AUDIENCE"]]]]])
-
-
 (defn current-page []
   [:div.wrapper
-   [nav]
-   [:div.page-content
-    [(session/get :current-page)]]])
+   [(session/get :current-page)]])
 
 ;; -------------------------
 ;; Routes
@@ -44,10 +21,10 @@
 (secretary/defroute "/" []
   (session/put! :current-page #'home/home-page))
 
-(secretary/defroute "/speaker" []
+(secretary/defroute "/teacher" []
   (session/put! :current-page #'speaker/speaker-page))
 
-(secretary/defroute "/audience" []
+(secretary/defroute "/student" []
   (session/put! :current-page #'audience/audience-page))
 
 ;; -------------------------

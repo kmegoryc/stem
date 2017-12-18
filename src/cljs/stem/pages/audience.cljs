@@ -2,6 +2,7 @@
   (:require [reagent.core :as reagent :refer [atom]]
             [ajax.core :refer [GET POST]]
             [stem.data :refer [all-surveys* read-surveys update-survey-handler error-handler]]
+            [stem.components :refer [nav]]
             [think.semantic-ui :as ui]))
 
 (def username*
@@ -108,12 +109,15 @@
 
 (defn audience-page []
   (fn []
-    [:div.audience-page
-     ;;[anonymous-mode]
-     [:div.content-section
-      [user-info]
-      (doall
-        (map
-          (fn [element]
-            (response-module element))
-          @all-surveys*))]]))
+    [:div
+     [nav "STUDENT"]
+     [:div.page-content
+      [:div.audience-page
+       ;;[anonymous-mode]
+       [:div.content-section
+        [user-info]
+        (doall
+          (map
+            (fn [element]
+              (response-module element))
+            @all-surveys*))]]]]))

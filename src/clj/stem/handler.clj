@@ -48,8 +48,8 @@
 
 (defroutes routes
   (GET "/" [] (loading-page))
-  (GET "/speaker" [] (loading-page))
-  (GET "/audience" [] (loading-page))
+  (GET "/teacher" [] (loading-page))
+  (GET "/student" [] (loading-page))
   (POST "/add-survey" request (create-survey request))
   (POST "/remove-survey" request (remove-survey request))
   (POST "/update-survey" request (update-survey request))
