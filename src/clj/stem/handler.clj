@@ -5,6 +5,7 @@
             [compojure.route :refer [not-found resources]]
             [hiccup.page :refer [include-js include-css html5]]
             [stem.middleware :refer [wrap-middleware]]
+            [stem.styles.global.typography :as typography]
             [ring.util.response :refer [redirect content-type resource-response response status]]
             [stem.model :refer [create-survey remove-survey update-survey read-surveys]]))
 
@@ -23,6 +24,8 @@
            :content "width=device-width, initial-scale=1"}]
    (include-css  "//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.css"
                  "/css/slider.css"
+                 "https://fonts.googleapis.com/css?family=Roboto"
+                 "https://fonts.googleapis.com/css?family=Open+Sans"
                  (if (env :dev) "/css/site.css" "/css/site.min.css"))])
 
 (defn loading-page []

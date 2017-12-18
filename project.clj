@@ -20,6 +20,7 @@
                  [http-kit "2.2.0"]
                  [thinktopic/think.semantic-ui "0.1.71.0-0"]
                  [thinktopic/greenhouse "0.1.1"]
+                 [com.andrewmcveigh/cljs-time "0.5.2"]
                  [yogthos/config "0.9"]
                  [org.clojure/clojurescript "1.9.908"
                   :scope "provided"]

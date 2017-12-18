@@ -73,7 +73,7 @@
                   :href "#"
                   :on-click (fn [ev]
                               (POST "/update-survey"
-                                    {:params {:id @username* :name name :choice @feedback* :anonymous toggle}
+                                    {:params {:id @username* :name name :choice @feedback*}
                                      :handler update-survey-handler
                                      :error-handler error-handler}))} "Submit Feedback"]]]))
 
@@ -109,7 +109,7 @@
 (defn audience-page []
   (fn []
     [:div.audience-page
-     [anonymous-mode]
+     ;;[anonymous-mode]
      [:div.content-section
       [user-info]
       (doall

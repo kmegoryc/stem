@@ -6,8 +6,7 @@
             [monger.conversion :refer [from-db-object to-object-id]]
             [clojure.edn :as edn]
             [clojure.java.io :as io]
-            [config.core :refer [env]])
-  (:import org.bson.types.ObjectId))
+            [config.core :refer [env]]))
 
 #_(def conn (mongo/connect {:host "127.0.0.1" :port 27017})
     ;;(mongo/connect (if (env :dev) "127.0.0.1" "heroku/mongo/")
@@ -58,9 +57,6 @@
     ;;
     )
 
-(defn read-surveys []
-  (response (read-edn)))
-
 (defn read-edn []
   (->> (resource-seq)
     (filter #(and (.contains (first %) "public/data") (.contains (first %) ".edn")))
@@ -71,7 +67,10 @@
 (defn write-edn [edn-updated]
   (spit "resources/public/data/modules.edn" edn-updated))
 
-(defn add-survey
+(defn read-surveys []
+  (response (read-edn)))
+
+(defn create-survey
   [request]
   (let [request-fp (assoc (:params request) :votes [])
         conj-result (conj (read-edn) request-fp)]

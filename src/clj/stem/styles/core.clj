@@ -40,5 +40,4 @@
    [:div.page-content
     section
     [:div.content-section
-     results-module
      response-module]]])

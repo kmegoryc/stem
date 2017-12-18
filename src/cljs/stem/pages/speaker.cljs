@@ -2,14 +2,22 @@
   (:require [reagent.core :as reagent :refer [atom]]
             [ajax.core :refer [GET POST PUT]]
             [think.semantic-ui :as ui]
+            [cljs-time.core :as t]
+            [cljs-time.local :as l]
+            [cljs-time.format :as f :refer [formatters formatter]]
             [stem.data :refer [all-surveys* read-surveys add-survey-handler remove-survey-handler error-handler]]))
 
+(def custom-formatter (formatter "H:mA MMM dd"))
+
 (defn create-module []
-  (let [create* (atom {:datatype "Choose a Module"
+  (let [create* (atom {:datatype "Survey Type"
                        :name nil
                        :option1 nil
                        :option2 nil
-                       :avg 50})
+                       :avg 50
+                       :timestamp nil
+                       :timestamp-verbose nil
+                       :importance 100})
         module-options ["Slider" "Toggle" "Question"]]
     (fn []
       [:div.create-module
@@ -55,17 +63,28 @@
                  [ui/form-input {:label "Option 2" :placeholder "Ex: Too Fast"
                                  :on-change (fn [ev data]
                                               (swap! create* assoc :option2 (:value (js->clj data :keywordize-keys true))))}]]])
-             [ui/button {:primary true
-                         :on-click (fn [ev]
-                                     (POST "/add-survey"
-                                           {:params @create*
-                                            :handler add-survey-handler
-                                            :error-handler error-handler}))} "Submit"]])]]]])))
+             [:b "Priority"]
+             [:div.rating
+              [ui/rating {:maxRating 5
+                          :clearable true
+                          :onRate (fn [ev data]
+                                    (swap! create* assoc :importance (:rating (js->clj data :keywordize-keys true))))}]]])]]
+        (when (contains? (into #{} module-options) (@create* :datatype))
+          [ui/modal-actions
+           [ui/button {:primary true
+                       :on-click (fn [ev]
+                                   (swap! create* assoc :timestamp (f/unparse custom-formatter (t/local-date-time (t/now))))
+                                   (swap! create* assoc :timestamp-verbose (str (t/local-date-time (t/now))))
+                                   (POST "/add-survey"
+                                         {:params @create*
+                                          :handler add-survey-handler
+                                          :error-handler error-handler}))} "Submit"]])]])))
 
 (defn progress
   [avg votes option1 option2]
   [:div.progress
-   [ui/progress {:percent (if (empty? votes)
+   [ui/progress {:style {:margin "20px 0"}
+                 :percent (if (empty? votes)
                             avg
                             (/ (apply + (map #(js/parseInt (:choice %)) votes)) (count votes)))
                  :indicating true
@@ -77,9 +96,7 @@
                           (< (if (empty? votes)
                                avg
                                (/ (apply + (map #(js/parseInt (:choice %)) votes)) (count votes))) 25) "red"
-                          :else "olive")}]
-   [:div {:style {:float "left" :color "grey"}} option1]
-   [:div {:style {:float "right" :color "grey"}} option2]])
+                          :else "olive")}]])
 
 (defn feed
   [votes]
@@ -95,35 +112,91 @@
           [ui/feed-extra {:text true} choice]]]) votes)]])
 
 (defn results-module
-  [i {:keys [datatype name option1 option2 avg votes]}]
+  [i {:keys [datatype name option1 option2 avg votes timestamp importance]}]
   (let [datatypes {:feedback "Question"
                    :slider "Slider"
-                   :toggle "Toggle"}]
+                   :toggle "Toggle"}
+        component (if (= datatype (datatypes :feedback))
+                    (if-not (= (count votes) 0) (feed votes) [:i "Waiting for responses..."])
+                    (progress avg votes option1 option2))
+        component-modal [ui/modal {:trigger (reagent/as-element
+                                              [ui/icon {:name "external"
+                                                        :style {:cursor :pointer}
+                                                        :color :blue}])}
+                         [ui/modal-header name]
+                         [ui/modal-content {:style {:margin "0 0 20px 0"}}
+                          [:p (str "Total Votes: " (count votes))]
+                          component
+                          [:div {:style {:float "left" :color "grey"}} option1]
+                          [:div {:style {:float "right" :color "grey"}} option2]]]]
+
     ^{:key i}
-    [:div.results-module
-     [ui/header {:size "medium"} name]
-     [ui/button {:primary true
-                 :icon true
-                 :circular true
-                 :style {:position :absolute :top 0 :right 0 :margin "10px"}
-                 :on-click (fn [ev]
-                             (POST "/remove-survey"
-                                   {:params {:name name}
-                                    :handler remove-survey-handler
-                                    :error-handler error-handler}))}
-      [ui/icon {:name "remove"}]]
-     (if (= datatype (datatypes :feedback))
-       (feed votes)
-       (progress avg votes option1 option2))]))
+    [ui/table-row
+     [ui/table-cell {:textAlign :center}
+      [ui/button {:basic true
+                  :primary true
+                  :icon true
+                  :circular true
+                  :on-click (fn [ev]
+                              (POST "/remove-survey"
+                                    {:params {:name name}
+                                     :handler remove-survey-handler
+                                     :error-handler error-handler}))}
+       [ui/icon {:name "remove"}]]]
+     [ui/table-cell
+      [ui/item-header name]]
+     [ui/table-cell {:width :six}
+      component]
+     [ui/table-cell {:verticalAlign :center}
+      component-modal]
+     [ui/table-cell {:style {:color :grey
+                             :font-size "13px"}}
+      timestamp]
+     [ui/table-cell
+      [ui/rating {:maxRating 5
+                  :disabled true
+                  :rating importance}]]]))
 
 (read-surveys)
 
 (defn speaker-page []
-  (fn []
-    [:div.speaker-page
-     [:div.content-section
-      [create-module]
-      (map-indexed
-        (fn [i element]
-          (results-module i element))
-        @all-surveys*)]]))
+  (let [organize-by* (atom "timestamp")]
+    (fn []
+      (let [table-header [ui/table-header
+                          [ui/table-row
+                           [ui/table-header-cell]
+                           [ui/table-header-cell "Survey"]
+                           [ui/table-header-cell "Status"]
+                           [ui/table-header-cell]
+                           [ui/table-header-cell {:style {:cursor :pointer
+                                                          :color (when (= @organize-by* "timestamp") "#2185d0")}
+                                                  :on-click (fn [ev]
+                                                              (reset! organize-by* "timestamp")
+                                                              (println @organize-by*))}
+                            [ui/icon {:name "sort"}]
+                            "Timestamp"]
+                           [ui/table-header-cell {:style {:cursor :pointer
+                                                          :color (when (= @organize-by* "importance") "#2185d0")}
+                                                  :on-click (fn [ev]
+                                                              (println "clicked")
+                                                              (reset! organize-by* "importance")
+                                                              (println @organize-by*))}
+                            [ui/icon {:name "sort"}]
+                            "Importance"]]]
+            table-body [ui/table-body
+                        (map-indexed
+                          (fn [i element]
+                            (results-module i element))
+                          (reverse
+                            (sort-by
+                              (if (= @organize-by* "timestamp") :timestamp :importance)
+                              @all-surveys*)))]]
+        [:div.speaker-page
+         [:div.content-section
+          [create-module]
+          [ui/table {:size "large"
+                     :basic true
+                     :attached :top
+                     :style {:border-radius "0px"}}
+           table-header
+           table-body]]]))))
